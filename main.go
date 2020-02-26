@@ -151,29 +151,34 @@ type IgluRPCServer struct {
 	Impl Iglu
 }
 
-func (s *IgluRPCServer) OnLoad() (err error) {
-	err = s.Impl.OnLoad()
-	return
+func (s *IgluRPCServer) OnLoad(args interface{}, resp *OnLoadReply) error {
+	resp.Err = s.Impl.OnLoad()
+	return nil
 }
 
-func (s *IgluRPCServer) PluginHTTP(req *http.Request) *http.Response {
-	return s.Impl.PluginHTTP(req)
+func (s *IgluRPCServer) PluginHTTP(args PluginHTTPArgs, resp *PluginHTTPReply) error {
+	resp.Response = s.Impl.PluginHTTP(args.Request)
+	return nil
 }
 
-func (s *IgluRPCServer) GetManifest() PluginManifest {
-	return s.Impl.GetManifest()
+func (s *IgluRPCServer) GetManifest(args interface{}, resp *GetManifestReply) error {
+	resp.Manifest = s.Impl.GetManifest()
+	return nil
 }
 
-func (s *IgluRPCServer) RegisterDevice(reg DeviceRegistration) error {
-	return s.Impl.RegisterDevice(reg)
+func (s *IgluRPCServer) RegisterDevice(args RegisterDeviceArgs, resp *RegisterDeviceReply) error {
+	resp.Err = s.Impl.RegisterDevice(args.Reg)
+	return nil
 }
 
-func (s *IgluRPCServer) OnDeviceToggle(id int, status bool) error {
-	return s.Impl.OnDeviceToggle(id, status)
+func (s *IgluRPCServer) OnDeviceToggle(args OnDeviceToggleArgs, resp *OnDeviceToggleReply) error {
+	resp.Err = s.Impl.OnDeviceToggle(args.Id, args.Status)
+	return nil
 }
 
-func (s *IgluRPCServer) GetWebExtensions() []WebExtension {
-	return s.Impl.GetWebExtensions()
+func (s *IgluRPCServer) GetWebExtensions(args interface{}, resp *GetWebExtensionsReply) error {
+	resp.Extensions = s.Impl.GetWebExtensions()
+	return nil
 }
 
 // This is the implementation of plugin.Plugin.
