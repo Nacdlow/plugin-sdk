@@ -1,4 +1,4 @@
-package api
+package sdk
 
 import (
 	"net/rpc"
@@ -7,15 +7,46 @@ import (
 	macaron "gopkg.in/macaron.v1"
 )
 
+// PluginManifest is used to describe the plugin's id, name, author, version, etc.
+type PluginManifest struct {
+	Id, Name, Author, Version string
+}
+
+// DeviceRegistration represents a device to be registered to a plugin. This is
+// used to inform a plugin about a device.
+type DeviceRegistration struct {
+	DeviceID    int
+	Description string
+	Type        int64 // TODO use enum
+}
+
+// ExtensionType specifies the type of web extension.
+type ExtensionType int
+
+const (
+	CSS = iota + 1
+	JavaScript
+)
+
+// WebExtension represents an addon to the web page.
+type WebExtension struct {
+	Type           ExtensionType
+	PathMatchRegex string
+	Source         string
+}
+
 // Iglu is the interface that we're exposing as a plugin.
 type Iglu interface {
 	OnLoad()
 	Middleware() macaron.Handler
 	// TODO these are interfaces yet to be implemented
-	RegisterDevice()
-	OnDeviceToggle()
+	GetManifest() PluginManifest
+	RegisterDevice(reg DeviceRegistration) error
+	OnDeviceToggle(id int, status bool) error
+	GetWebExtensions() []WebExtension
 }
 
+// IgluRPC is what the server is using to communicate to the plugin over RPC
 type IgluRPC struct{ client *rpc.Client }
 
 func (i *IgluRPC) OnLoad() {
@@ -33,6 +64,7 @@ func (i *IgluRPC) Middleware() (handler macaron.Handler) {
 	return
 }
 
+// IgluRPCServer is the RPC server which IgluRPC talks to.
 type IgluRPCServer struct {
 	Impl Iglu
 }

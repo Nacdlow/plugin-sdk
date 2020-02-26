@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
+	"github.com/Nacdlow/plugin-sdk"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	api "gitlab.com/group-nacdlow/plugin-api"
 )
 
 // TestPlugin is an implementation of IgluPlugin
@@ -36,7 +36,7 @@ func main() {
 
 	// pluginMap is the map of plugins we can dispense.
 	var pluginMap = map[string]plugin.Plugin{
-		"test": &api.IgluPlugin{Impl: test},
+		"iglu_plugin": &api.IgluPlugin{Impl: test},
 	}
 
 	plugin.Serve(&plugin.ServeConfig{

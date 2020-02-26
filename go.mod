@@ -1,4 +1,4 @@
-module gitlab.com/group-nacdlow/plugin-api
+module github.com/Nacdlow/plugin-sdk
 
 go 1.13
 
