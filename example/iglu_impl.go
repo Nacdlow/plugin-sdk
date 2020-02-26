@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/Nacdlow/plugin-sdk"
@@ -13,8 +14,34 @@ type TestPlugin struct {
 	logger hclog.Logger
 }
 
-func (g *TestPlugin) OnLoad() {
+func (g *TestPlugin) OnLoad() error {
 	g.logger.Debug("Loading test plugin!")
+	return nil
+}
+
+func (g *TestPlugin) PluginHTTP(req *http.Request) *http.Response {
+	return nil
+}
+
+func (g *TestPlugin) GetManifest() sdk.PluginManifest {
+	return sdk.PluginManifest{
+		Id:      "test",
+		Name:    "Test Plugin",
+		Author:  "Nacdlow",
+		Version: "v0.1.0",
+	}
+}
+
+func (g *TestPlugin) RegisterDevice(reg sdk.DeviceRegistration) error {
+	return nil
+}
+
+func (g *TestPlugin) OnDeviceToggle(id int, status bool) error {
+	return nil
+}
+
+func (g *TestPlugin) GetWebExtensions() []sdk.WebExtension {
+	return nil
 }
 
 var handshakeConfig = plugin.HandshakeConfig{
@@ -36,7 +63,7 @@ func main() {
 
 	// pluginMap is the map of plugins we can dispense.
 	var pluginMap = map[string]plugin.Plugin{
-		"iglu_plugin": &api.IgluPlugin{Impl: test},
+		"iglu_plugin": &sdk.IgluPlugin{Impl: test},
 	}
 
 	plugin.Serve(&plugin.ServeConfig{

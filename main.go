@@ -1,10 +1,10 @@
 package sdk
 
 import (
+	"net/http"
 	"net/rpc"
 
 	"github.com/hashicorp/go-plugin"
-	macaron "gopkg.in/macaron.v1"
 )
 
 // PluginManifest is used to describe the plugin's id, name, author, version, etc.
@@ -37,9 +37,8 @@ type WebExtension struct {
 
 // Iglu is the interface that we're exposing as a plugin.
 type Iglu interface {
-	OnLoad()
-	Middleware() macaron.Handler
-	// TODO these are interfaces yet to be implemented
+	OnLoad() error
+	PluginHTTP(request *http.Request) *http.Response
 	GetManifest() PluginManifest
 	RegisterDevice(reg DeviceRegistration) error
 	OnDeviceToggle(id int, status bool) error
@@ -49,19 +48,102 @@ type Iglu interface {
 // IgluRPC is what the server is using to communicate to the plugin over RPC
 type IgluRPC struct{ client *rpc.Client }
 
-func (i *IgluRPC) OnLoad() {
-	err := i.client.Call("Plugin.OnLoad", new(interface{}), nil)
-	if err != nil {
-		panic(err)
-	}
+type OnLoadReply struct {
+	Err error
 }
 
-func (i *IgluRPC) Middleware() (handler macaron.Handler) {
-	err := i.client.Call("Plugin.Middleware", new(interface{}), &handler)
+func (i *IgluRPC) OnLoad() error {
+	rep := &OnLoadReply{}
+	err := i.client.Call("Plugin.OnLoad", new(interface{}), &rep)
 	if err != nil {
 		panic(err)
 	}
-	return
+	return rep.Err
+}
+
+type Context struct {
+	Username string
+}
+
+type PluginHTTPArgs struct {
+	Request *http.Request
+}
+
+type PluginHTTPReply struct {
+	Response *http.Response
+}
+
+func (i *IgluRPC) PluginHTTP(req *http.Request) *http.Response {
+	args := &PluginHTTPArgs{Request: req}
+	rep := &PluginHTTPReply{}
+	err := i.client.Call("Plugin.PluginHTTP", args, rep)
+	if err != nil {
+		panic(err)
+	}
+	return rep.Response
+}
+
+type GetManifestReply struct {
+	Manifest PluginManifest
+}
+
+func (i *IgluRPC) GetManifest() PluginManifest {
+	rep := &GetManifestReply{}
+	err := i.client.Call("Plugin.GetManifest", new(interface{}), &rep)
+	if err != nil {
+		panic(err)
+	}
+	return rep.Manifest
+}
+
+type RegisterDeviceArgs struct {
+	Reg DeviceRegistration
+}
+
+type RegisterDeviceReply struct {
+	Err error
+}
+
+func (i *IgluRPC) RegisterDevice(reg DeviceRegistration) error {
+	args := &RegisterDeviceArgs{Reg: reg}
+	rep := &RegisterDeviceReply{}
+	err := i.client.Call("Plugin.RegisterDevice", args, rep)
+	if err != nil {
+		panic(err)
+	}
+	return rep.Err
+}
+
+type OnDeviceToggleArgs struct {
+	Id     int
+	Status bool
+}
+
+type OnDeviceToggleReply struct {
+	Err error
+}
+
+func (i *IgluRPC) OnDeviceToggle(id int, status bool) error {
+	args := &OnDeviceToggleArgs{Id: id, Status: status}
+	rep := &OnDeviceToggleReply{}
+	err := i.client.Call("Plugin.OnDeviceToggle", args, &rep)
+	if err != nil {
+		panic(err)
+	}
+	return rep.Err
+}
+
+type GetWebExtensionsReply struct {
+	Extensions []WebExtension
+}
+
+func (i *IgluRPC) GetWebExtensions() []WebExtension {
+	rep := &GetWebExtensionsReply{}
+	err := i.client.Call("Plugin.GetWebExtensions", new(interface{}), rep)
+	if err != nil {
+		panic(err)
+	}
+	return rep.Extensions
 }
 
 // IgluRPCServer is the RPC server which IgluRPC talks to.
@@ -69,13 +151,29 @@ type IgluRPCServer struct {
 	Impl Iglu
 }
 
-func (s *IgluRPCServer) OnLoad(args interface{}) error {
-	s.Impl.OnLoad()
-	return nil
+func (s *IgluRPCServer) OnLoad() (err error) {
+	err = s.Impl.OnLoad()
+	return
 }
 
-func (s *IgluRPCServer) Middleware(args interface{}) macaron.Handler {
-	return s.Impl.Middleware()
+func (s *IgluRPCServer) PluginHTTP(req *http.Request) *http.Response {
+	return s.Impl.PluginHTTP(req)
+}
+
+func (s *IgluRPCServer) GetManifest() PluginManifest {
+	return s.Impl.GetManifest()
+}
+
+func (s *IgluRPCServer) RegisterDevice(reg DeviceRegistration) error {
+	return s.Impl.RegisterDevice(reg)
+}
+
+func (s *IgluRPCServer) OnDeviceToggle(id int, status bool) error {
+	return s.Impl.OnDeviceToggle(id, status)
+}
+
+func (s *IgluRPCServer) GetWebExtensions() []WebExtension {
+	return s.Impl.GetWebExtensions()
 }
 
 // This is the implementation of plugin.Plugin.
