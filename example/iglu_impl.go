@@ -19,8 +19,7 @@ func (g *TestPlugin) OnLoad() error {
 	return nil
 }
 
-func (g *TestPlugin) PluginHTTP(req *http.Request) *http.Response {
-	return nil
+func (g *TestPlugin) PluginHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (g *TestPlugin) GetManifest() sdk.PluginManifest {

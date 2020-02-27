@@ -38,7 +38,7 @@ type WebExtension struct {
 // Iglu is the interface that we're exposing as a plugin.
 type Iglu interface {
 	OnLoad() error
-	PluginHTTP(request *http.Request) *http.Response
+	PluginHTTP(w http.ResponseWriter, r *http.Request)
 	GetManifest() PluginManifest
 	RegisterDevice(reg DeviceRegistration) error
 	OnDeviceToggle(id int, status bool) error
@@ -53,7 +53,7 @@ type OnLoadReply struct {
 }
 
 func (i *IgluRPC) OnLoad() error {
-	rep := &OnLoadReply{}
+	rep := OnLoadReply{}
 	err := i.client.Call("Plugin.OnLoad", new(interface{}), &rep)
 	if err != nil {
 		panic(err)
@@ -61,26 +61,17 @@ func (i *IgluRPC) OnLoad() error {
 	return rep.Err
 }
 
-type Context struct {
-	Username string
-}
-
 type PluginHTTPArgs struct {
+	Writer  http.ResponseWriter
 	Request *http.Request
 }
 
-type PluginHTTPReply struct {
-	Response *http.Response
-}
-
-func (i *IgluRPC) PluginHTTP(req *http.Request) *http.Response {
-	args := &PluginHTTPArgs{Request: req}
-	rep := &PluginHTTPReply{}
-	err := i.client.Call("Plugin.PluginHTTP", args, &rep)
+func (i *IgluRPC) PluginHTTP(w http.ResponseWriter, req *http.Request) {
+	args := &PluginHTTPArgs{Writer: w, Request: req}
+	err := i.client.Call("Plugin.PluginHTTP", args, new(interface{}))
 	if err != nil {
 		panic(err)
 	}
-	return rep.Response
 }
 
 type GetManifestReply struct {
@@ -88,7 +79,7 @@ type GetManifestReply struct {
 }
 
 func (i *IgluRPC) GetManifest() PluginManifest {
-	rep := &GetManifestReply{}
+	rep := GetManifestReply{}
 	err := i.client.Call("Plugin.GetManifest", new(interface{}), &rep)
 	if err != nil {
 		panic(err)
@@ -106,7 +97,7 @@ type RegisterDeviceReply struct {
 
 func (i *IgluRPC) RegisterDevice(reg DeviceRegistration) error {
 	args := &RegisterDeviceArgs{Reg: reg}
-	rep := &RegisterDeviceReply{}
+	rep := RegisterDeviceReply{}
 	err := i.client.Call("Plugin.RegisterDevice", args, &rep)
 	if err != nil {
 		panic(err)
@@ -156,8 +147,8 @@ func (s *IgluRPCServer) OnLoad(args interface{}, resp *OnLoadReply) error {
 	return nil
 }
 
-func (s *IgluRPCServer) PluginHTTP(args PluginHTTPArgs, resp *PluginHTTPReply) error {
-	resp.Response = s.Impl.PluginHTTP(args.Request)
+func (s *IgluRPCServer) PluginHTTP(args PluginHTTPArgs, new interface{}) error {
+	s.Impl.PluginHTTP(args.Writer, args.Request)
 	return nil
 }
 
