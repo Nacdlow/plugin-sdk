@@ -76,7 +76,7 @@ type PluginHTTPReply struct {
 func (i *IgluRPC) PluginHTTP(req *http.Request) *http.Response {
 	args := &PluginHTTPArgs{Request: req}
 	rep := &PluginHTTPReply{}
-	err := i.client.Call("Plugin.PluginHTTP", args, rep)
+	err := i.client.Call("Plugin.PluginHTTP", args, &rep)
 	if err != nil {
 		panic(err)
 	}
@@ -107,7 +107,7 @@ type RegisterDeviceReply struct {
 func (i *IgluRPC) RegisterDevice(reg DeviceRegistration) error {
 	args := &RegisterDeviceArgs{Reg: reg}
 	rep := &RegisterDeviceReply{}
-	err := i.client.Call("Plugin.RegisterDevice", args, rep)
+	err := i.client.Call("Plugin.RegisterDevice", args, &rep)
 	if err != nil {
 		panic(err)
 	}
@@ -139,7 +139,7 @@ type GetWebExtensionsReply struct {
 
 func (i *IgluRPC) GetWebExtensions() []WebExtension {
 	rep := &GetWebExtensionsReply{}
-	err := i.client.Call("Plugin.GetWebExtensions", new(interface{}), rep)
+	err := i.client.Call("Plugin.GetWebExtensions", new(interface{}), &rep)
 	if err != nil {
 		panic(err)
 	}
