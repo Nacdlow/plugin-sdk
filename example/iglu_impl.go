@@ -20,6 +20,7 @@ func (g *TestPlugin) OnLoad() error {
 }
 
 func (g *TestPlugin) PluginHTTP(w http.ResponseWriter, req *http.Request) {
+	w.Write([]byte("Hello from test plugin!"))
 }
 
 func (g *TestPlugin) GetManifest() sdk.PluginManifest {
@@ -40,7 +41,10 @@ func (g *TestPlugin) OnDeviceToggle(id int, status bool) error {
 }
 
 func (g *TestPlugin) GetWebExtensions() []sdk.WebExtension {
-	return nil
+	return []sdk.WebExtension{
+		{Type: sdk.CSS, Source: "/*Test CSS*/", PathMatchRegex: "*"},
+		{Type: sdk.JavaScript, Source: "/*Test JS*/", PathMatchRegex: "*"},
+	}
 }
 
 var handshakeConfig = plugin.HandshakeConfig{

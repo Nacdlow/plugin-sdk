@@ -68,7 +68,7 @@ type PluginHTTPArgs struct {
 
 func (i *IgluRPC) PluginHTTP(w http.ResponseWriter, req *http.Request) {
 	args := &PluginHTTPArgs{Writer: w, Request: req}
-	err := i.client.Call("Plugin.PluginHTTP", args, new(interface{}))
+	err := i.client.Call("Plugin.PluginHTTP", args, nil)
 	if err != nil {
 		panic(err)
 	}
