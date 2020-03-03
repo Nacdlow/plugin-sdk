@@ -35,7 +35,7 @@ func (s *IgluRPCServer) GetPluginConfiguration(args interface{}, resp *GetPlugin
 	return nil
 }
 
-func (s *IgluRPCServer) OnConfigurationUpdate(args OnConfigurationUpdateArgs, resp interface{}) error {
+func (s *IgluRPCServer) OnConfigurationUpdate(args OnConfigurationUpdateArgs, resp *interface{}) error {
 	s.Impl.OnConfigurationUpdate(args.Configuration)
 	return nil
 }

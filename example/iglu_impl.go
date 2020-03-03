@@ -43,7 +43,9 @@ func (g *TestPlugin) OnConfigurationUpdate(config []sdk.ConfigKV) {
 }
 
 func (g *TestPlugin) GetAvailableDevices() []sdk.AvailableDevice {
-	return []sdk.AvailableDevice{}
+	return []sdk.AvailableDevice{
+		{UniqueID: "TestDevice01", ManufacturerName: "Acme Corp", ModelName: "Acme LED Hue", Type: 0},
+	}
 }
 
 func (g *TestPlugin) GetWebExtensions() []sdk.WebExtension {
