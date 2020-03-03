@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"os"
 
 	"github.com/Nacdlow/plugin-sdk"
@@ -19,10 +18,6 @@ func (g *TestPlugin) OnLoad() error {
 	return nil
 }
 
-func (g *TestPlugin) PluginHTTP(w http.ResponseWriter, req *http.Request) {
-	w.Write([]byte("Hello from test plugin!"))
-}
-
 func (g *TestPlugin) GetManifest() sdk.PluginManifest {
 	return sdk.PluginManifest{
 		Id:      "test",
@@ -38,6 +33,17 @@ func (g *TestPlugin) RegisterDevice(reg sdk.DeviceRegistration) error {
 
 func (g *TestPlugin) OnDeviceToggle(id int, status bool) error {
 	return nil
+}
+
+func (g *TestPlugin) GetPluginConfiguration() []sdk.PluginConfig {
+	return []sdk.PluginConfig{}
+}
+
+func (g *TestPlugin) OnConfigurationUpdate(config []sdk.ConfigKV) {
+}
+
+func (g *TestPlugin) GetAvailableDevices() []sdk.AvailableDevice {
+	return []sdk.AvailableDevice{}
 }
 
 func (g *TestPlugin) GetWebExtensions() []sdk.WebExtension {
