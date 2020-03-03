@@ -33,13 +33,23 @@ type WebExtension struct {
 	Source         string
 }
 
+type ValueType int64
+
+const (
+	StringValue = iota
+	NumberValue
+	OptionValue // drop down list
+	BooleanValue
+)
+
 // PluginConfig represents a plugin's configuration key-value item constraints
 // including title and description.
 type PluginConfig struct {
 	Title          string
 	Description    string
-	Key            string // a unique key
-	ValueType      int64  // TODO make enum
+	Key            string    // a unique key
+	Type           ValueType // TODO make enum
+	Values         string    // for option lists, comma separated values
 	IsUserSpecific bool
 }
 
