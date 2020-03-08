@@ -47,6 +47,8 @@ type PluginConfig struct {
 	Description    string
 	Key            string // a unique key
 	Type           int
+	Default        string // Not for OptionValues
+	Placeholder    string
 	Values         []string // for option lists, first value is default
 	IsUserSpecific bool
 }
