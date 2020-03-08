@@ -33,8 +33,6 @@ type WebExtension struct {
 	Source         string
 }
 
-type ValueType int64
-
 const (
 	StringValue = iota
 	NumberValue
@@ -47,9 +45,9 @@ const (
 type PluginConfig struct {
 	Title          string
 	Description    string
-	Key            string    // a unique key
-	Type           ValueType // TODO make enum
-	Values         string    // for option lists, comma separated values
+	Key            string // a unique key
+	Type           int
+	Values         []string // for option lists, first value is default
 	IsUserSpecific bool
 }
 

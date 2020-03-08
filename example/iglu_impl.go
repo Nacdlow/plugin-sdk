@@ -36,7 +36,16 @@ func (g *TestPlugin) OnDeviceToggle(id int, status bool) error {
 }
 
 func (g *TestPlugin) GetPluginConfiguration() []sdk.PluginConfig {
-	return []sdk.PluginConfig{}
+	return []sdk.PluginConfig{
+		{Title: "Option Text", Description: "This is a text field.", Key: "text1",
+			Type: sdk.StringValue, IsUserSpecific: true},
+		{Title: "Option Bool", Description: "This is a true/false field.", Key: "bool1",
+			Type: sdk.BooleanValue, IsUserSpecific: false},
+		{Title: "Option Num", Description: "This is a number field.", Key: "num1",
+			Type: sdk.NumberValue, IsUserSpecific: false},
+		{Title: "Option Selection", Description: "This is a selection field..", Key: "select1",
+			Type: sdk.OptionValue, Values: []string{"Default", "Easy", "Hard"}, IsUserSpecific: true},
+	}
 }
 
 func (g *TestPlugin) OnConfigurationUpdate(config []sdk.ConfigKV) {
