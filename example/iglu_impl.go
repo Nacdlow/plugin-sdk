@@ -27,12 +27,12 @@ func (g *TestPlugin) GetManifest() sdk.PluginManifest {
 	}
 }
 
-func (g *TestPlugin) RegisterDevice(reg sdk.DeviceRegistration) error {
+func (g *TestPlugin) OnDeviceToggle(id string, status bool) error {
 	return nil
 }
 
-func (g *TestPlugin) OnDeviceToggle(id int, status bool) error {
-	return nil
+func (g *TestPlugin) GetDeviceStatus(id string) bool {
+	return false
 }
 
 func (g *TestPlugin) GetPluginConfiguration() []sdk.PluginConfig {
