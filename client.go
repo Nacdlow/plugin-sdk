@@ -68,6 +68,7 @@ type Iglu interface {
 	OnLoad() error
 	GetManifest() PluginManifest
 	OnDeviceToggle(uniqueID string, status bool) error
+	GetDeviceStatus(uniqueID string) bool
 	GetWebExtensions() []WebExtension
 	GetPluginConfiguration() []PluginConfig
 	OnConfigurationUpdate(conf []ConfigKV)
@@ -174,6 +175,24 @@ func (i *IgluRPC) GetAvailableDevices() []AvailableDevice {
 		panic(err)
 	}
 	return rep.Devices
+}
+
+type GetDeviceStatusArgs struct {
+	UniqueID string
+}
+
+type GetDeviceStatusReply struct {
+	Status bool
+}
+
+func (i *IgluRPC) GetDeviceStatus(uniqueID string) bool {
+	args := &GetDeviceStatusArgs{UniqueID: uniqueID}
+	rep := &GetDeviceStatusReply{}
+	err := i.client.Call("Plugin.GetDeviceStatus", args, &rep)
+	if err != nil {
+		panic(err)
+	}
+	return rep.Status
 }
 
 // This is the implementation of plugin.Plugin.

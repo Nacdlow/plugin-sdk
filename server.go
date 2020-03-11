@@ -39,3 +39,8 @@ func (s *IgluRPCServer) GetAvailableDevices(args interface{}, resp *GetAvailable
 	resp.Devices = s.Impl.GetAvailableDevices()
 	return nil
 }
+
+func (s *IgluRPCServer) GetDeviceStatus(args GetDeviceStatusArgs, resp *GetDeviceStatusReply) error {
+	resp.Status = s.Impl.GetDeviceStatus(args.UniqueID)
+	return nil
+}
