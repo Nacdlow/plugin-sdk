@@ -67,7 +67,7 @@ type AvailableDevice struct {
 type Iglu interface {
 	OnLoad() error
 	GetManifest() PluginManifest
-	OnDeviceToggle(uniqueID string, status bool) error
+	OnDeviceToggle(uniqueID string, status bool)
 	GetDeviceStatus(uniqueID string) bool
 	GetWebExtensions() []WebExtension
 	GetPluginConfiguration() []PluginConfig
@@ -111,18 +111,12 @@ type OnDeviceToggleArgs struct {
 	Status bool
 }
 
-type OnDeviceToggleReply struct {
-	Err error
-}
-
-func (i *IgluRPC) OnDeviceToggle(id string, status bool) error {
+func (i *IgluRPC) OnDeviceToggle(id string, status bool) {
 	args := &OnDeviceToggleArgs{Id: id, Status: status}
-	rep := &OnDeviceToggleReply{}
-	err := i.client.Call("Plugin.OnDeviceToggle", args, &rep)
+	err := i.client.Call("Plugin.OnDeviceToggle", args, 0)
 	if err != nil {
 		panic(err)
 	}
-	return rep.Err
 }
 
 type GetWebExtensionsReply struct {
