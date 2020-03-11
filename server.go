@@ -15,11 +15,6 @@ func (s *IgluRPCServer) GetManifest(args interface{}, resp *GetManifestReply) er
 	return nil
 }
 
-func (s *IgluRPCServer) RegisterDevice(args RegisterDeviceArgs, resp *RegisterDeviceReply) error {
-	resp.Err = s.Impl.RegisterDevice(args.Reg)
-	return nil
-}
-
 func (s *IgluRPCServer) OnDeviceToggle(args OnDeviceToggleArgs, resp *OnDeviceToggleReply) error {
 	resp.Err = s.Impl.OnDeviceToggle(args.Id, args.Status)
 	return nil

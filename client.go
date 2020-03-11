@@ -11,13 +11,6 @@ type PluginManifest struct {
 	Id, Name, Author, Version string
 }
 
-// DeviceRegistration represents a device to be registered to a plugin. This is
-// used to inform a plugin about hooking up a device.
-type DeviceRegistration struct {
-	UniqueID string
-	Type     int64 // TODO use enum
-}
-
 // ExtensionType specifies the type of web extension.
 type ExtensionType int
 
@@ -74,8 +67,7 @@ type AvailableDevice struct {
 type Iglu interface {
 	OnLoad() error
 	GetManifest() PluginManifest
-	RegisterDevice(reg DeviceRegistration) error
-	OnDeviceToggle(id int, status bool) error
+	OnDeviceToggle(uniqueID string, status bool) error
 	GetWebExtensions() []WebExtension
 	GetPluginConfiguration() []PluginConfig
 	OnConfigurationUpdate(conf []ConfigKV)
@@ -113,26 +105,8 @@ func (i *IgluRPC) GetManifest() PluginManifest {
 	return rep.Manifest
 }
 
-type RegisterDeviceArgs struct {
-	Reg DeviceRegistration
-}
-
-type RegisterDeviceReply struct {
-	Err error
-}
-
-func (i *IgluRPC) RegisterDevice(reg DeviceRegistration) error {
-	args := &RegisterDeviceArgs{Reg: reg}
-	rep := RegisterDeviceReply{}
-	err := i.client.Call("Plugin.RegisterDevice", args, &rep)
-	if err != nil {
-		panic(err)
-	}
-	return rep.Err
-}
-
 type OnDeviceToggleArgs struct {
-	Id     int
+	Id     string
 	Status bool
 }
 
@@ -140,7 +114,7 @@ type OnDeviceToggleReply struct {
 	Err error
 }
 
-func (i *IgluRPC) OnDeviceToggle(id int, status bool) error {
+func (i *IgluRPC) OnDeviceToggle(id string, status bool) error {
 	args := &OnDeviceToggleArgs{Id: id, Status: status}
 	rep := &OnDeviceToggleReply{}
 	err := i.client.Call("Plugin.OnDeviceToggle", args, &rep)
